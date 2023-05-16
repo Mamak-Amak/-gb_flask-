@@ -1,18 +1,12 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from blog.models.database import db
-from flask_login import UserMixin
+class LoginForm(FlaskForm):
 
 
-class User(db.Model, UserMixin):
-    id = Column(Integer, primary_key=True)
-    username = Column(String(80), unique=True, nullable=False)
-    is_staff = Column(Boolean, nullable=False, default=False)
-    
-    def __repr__(self):
-        return f"<User #{self.id} {self.username!r}>"
-
-
-
-email = Column(String(255), nullable=False, default="", server_default="")
-
-main
+username = StringField(
+    "username",
+    [validators.DataRequired()],
+)
+password = PasswordField(
+    "Password",
+    [validators.DataRequired()],
+)
+submit = SubmitField("Login")
