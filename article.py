@@ -17,6 +17,8 @@ class Article(db.Model):
                           server_default=func.now())
         dt_updated=Column(DateTime, default=datetime.utcnow,
                           onupdate=datetime.utcnow)
+        def __str__(self):
+            return self.title
     )
 
 
@@ -31,3 +33,15 @@ class CreateArticleForm(FlaskForm):
     [validators.DataRequired()],
 )
     submit = SubmitField("Publish")
+
+
+class Author(db.Model):
+
+    def __str__(self):
+        return self.user.username
+
+
+class Tag(db.Model):
+
+    def __str__(self):
+        return self.name

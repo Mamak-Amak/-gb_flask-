@@ -1,3 +1,4 @@
+from blog.admin import admin
 from blog.models import Tag
 from blog.models import User
 from blog.models.database import db
@@ -61,3 +62,6 @@ def create_tags():
         db.session.add(tag)
     db.session.commit()
     print("created tags")
+
+
+admin.init_app(app)
