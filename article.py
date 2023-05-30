@@ -1,47 +1,36 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField, validators
-from blog.models.article_tag import article_tag_association_table
+from combojsonapi.utils import Relationship
+from marshmallow_jsonapi import Schema, fields
 
 
-class Article(db.Model):
+class ArticleSchema(Schema):
+    class Meta:
 
-    tags = relationship(
-    "Tag",
-    secondary=article_tag_association_table,
-    back_populates="articles",
+        type_ = "article"
+        self_view = "article_detail"
+        self_view_kwargs = {"id": "<id>"}
+        self_view_many = "article_list"
 
-        title=Column(String(200), nullable=False,
-                     default="", server_default="")
-        body=Column(Text, nullable=False, default="", server_default="")
-        dt_created=Column(DateTime, default=datetime.utcnow,
-                          server_default=func.now())
-        dt_updated=Column(DateTime, default=datetime.utcnow,
-                          onupdate=datetime.utcnow)
-        def __str__(self):
-            return self.title
-    )
+    id = fields.Integer(as_string=True)
+    title = fields.String(allow_none=False)
+    body = fields.String(allow_none=False)
+    dt_created = fields.DateTime(allow_none=False)
+    dt_updated = fields.DateTime(allow_none=False)
 
-
-class CreateArticleForm(FlaskForm):
-
-    title = StringField(
-    "Title",
-    [validators.DataRequired()],
+    author = Relationship(
+        nested="AuthorSchema",
+        attribute="author",
+        related_view="author_detail",
+        related_view_kwargs={"id": "<id>"},
+        schema="AuthorSchema",
+        type_="author",
+        many=False,
 )
-    body = TextAreaField(
-    "Body",
-    [validators.DataRequired()],
+    tags = Relationship(
+        nested="TagSchema",
+        attribute="tags",
+        related_view="tag_detail",
+        related_view_kwargs={"id": "<id>"},
+        schema="TagSchema",
+        type_="tag",
+        many=True,
 )
-    submit = SubmitField("Publish")
-
-
-class Author(db.Model):
-
-    def __str__(self):
-        return self.user.username
-
-
-class Tag(db.Model):
-
-    def __str__(self):
-        return self.name
