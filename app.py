@@ -1,3 +1,4 @@
+from blog.api import init_api
 from blog.admin import admin
 from blog.models import Tag
 from blog.models import User
@@ -65,3 +66,5 @@ def create_tags():
 
 
 admin.init_app(app)
+
+api = init_api(app)
