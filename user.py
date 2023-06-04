@@ -1,28 +1,23 @@
-from combojsonapi.utils import Relationship
-from marshmallow_jsonapi import Schema, fields
+from flask_combo_jsonapi import ResourceDetail, ResourceList
+from blog.schemas import UserSchema
+from blog.models.database import db
+from blog.models import User
+from blog.permissions.user import UserPermission
 
-class UserSchema(Schema):
-    class Meta:
 
+class UserList(ResourceList):
 
-        type_ = "user"
-        self_view = "user_detail"
-        self_view_kwargs = {"id": "<id>"}
-        self_view_many = "user_list"
+    schema = UserSchema
+    data_layer = {
+        "session": db.session,
+        "model": User,
+}
 
-    id = fields.Integer(as_string=True)
-    first_name = fields.String(allow_none=False)
-    last_name = fields.String(allow_none=False)
-    username = fields.String(allow_none=False)
-    email = fields.String(allow_none=False)
-    is_staff = fields.Boolean(allow_none=False)
-    
-    author = Relationship(
-        nested="AuthorSchema",
-        attribute="author",
-        related_view="author_detail",
-        related_view_kwargs={"id": "<id>"},
-        schema="AuthorSchema",
-        type_="author",
-        many=False,
-)
+class UserDetail(ResourceDetail):
+
+    schema = UserSchema
+    data_layer = {
+        "session": db.session,
+        "model": User,
+        "permission_get": [UserPermission],
+}
