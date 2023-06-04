@@ -1,31 +1,28 @@
-from combojsonapi.utils import Relationship
-from marshmallow_jsonapi import Schema, fields
+from combojsonapi.event.resource import EventsResource
+from blog.models import Author, Article
+from flask_combo_jsonapi import ResourceDetail, ResourceList
+from blog.schemas import AuthorSchema
+from blog.models.database import db
+from blog.models import Author
 
-class AuthorSchema(Schema):
-    class Meta:
-        type = "author"
-        self_view = "author_detail"
-        self_view_kwargs = {"id": "<id>"}
-        self_view_many = "author_list"
-    
-    id = fields.Integer(as_string=True)
+class AuthorList(ResourceList):
+    schema = AuthorSchema
+    data_layer = {
+        "session": db.session,
+        "model": Author,
+}
+class AuthorDetail(ResourceDetail):
+
+    schema = AuthorSchema
+    data_layer = {
+        "session": db.session,
+        "model": Author,
+    }
 
 
-    user = Relationship(
-        nested="UserSchema",
-        attribute="user",
-        related_view="user_detail",
-        related_view_kwargs={"id": "<id>"},
-        schema="UserSchema",
-        type_="user",
-        many=False,
-)
-    articles = Relationship(
-        nested="ArticleSchema",
-        attribute="articles",
-        related_view="article_detail",
-        related_view_kwargs={"id": "<id>"},
-        schema="ArticleSchema",
-        type_="article",
-        many=True,
-)
+class AuthorDetailEvents(EventsResource):
+    def event_get_articles_count(self, **kwargs):
+        return {"count": Article.query.filter(Article.author_id == kwargs["id"]).count()}
+
+class AuthorDetail(ResourceDetail):
+    events = AuthorDetailEvents
